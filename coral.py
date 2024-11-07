@@ -40,7 +40,7 @@ def test_lsusb(lsusb, vendor_name):
 def pass_usb_device_to_vm(device_name, vm_name):
   pusb_list_cmd = "sudo xe pusb-list"
   usb_regex = r"uuid.*:\s([0-9a-z-]+)\n.*\n.*\n\s*vendor-desc.*:\s{0}".format(re.escape(device_name))
-  usb_uuid = exec_and_read(
+  usb_uuid = exec_and_match(
     pusb_list_cmd,
     usb_regex,
     "USB UUID for {0}".format(device_name)
@@ -51,11 +51,11 @@ def pass_usb_device_to_vm(device_name, vm_name):
 
   usb_groups_cmd = "sudo xe usb-group-list PUSB-uuids={0}".format(usb_uuid)
   group_regex = r"uuid.*:\s([0-9a-z-]+)\n.*name-label.*:\sGroup\sof\s[a-z0-9\s]+USBs"
-  usb_group = exec_and_read(usb_groups_cmd, group_regex, "USB Group")
+  usb_group = exec_and_match(usb_groups_cmd, group_regex, "USB Group")
 
   vm_list_cmd = "sudo xe vm-list"
   vm_regex = r"uuid.*:\s([a-z0-9\-]+)$\s*name-label.*:\s{0}".format(vm_name)
-  vm_uuid = exec_and_read(vm_list_cmd, vm_regex, "VM UUID")
+  vm_uuid = exec_and_match(vm_list_cmd, vm_regex, "VM UUID")
 
   vm_shutdown_cmd = "sudo xe vm-shutdown uuid={0}".format(vm_uuid)
   call_cmd(vm_shutdown_cmd)
@@ -91,7 +91,7 @@ def main():
     sys.exit("Coral device not detected!")
 
   print("Coral device detected as {0} but it needs to be initialized.".format(device_name))
-  print("Target VM ({1}) will reboot!".format(vm_name))
+  print("Target VM ({0}) will reboot!".format(vm_name))
 
   pass_usb_device_to_vm(device_name, vm_name)
 
